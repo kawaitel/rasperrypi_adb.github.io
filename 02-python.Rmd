@@ -1,0 +1,84 @@
+# 発信音を検出して録音
+
+-   発信音を検出して相手側音声をWAVファイルとしてタイムスタンプをつけて保存
+
+-   録音時間は`RECORD_TIME`で規定
+
+-   ViberやSMSなど短い通知音を出さないように設定しておく
+
+-   USBオーディオアダプターの警告メッセージの抑制
+
+**incoming_record.py**
+
+```{python eval=F,echo=T}
+#!/usr/bin/python3
+import pyaudio
+import numpy as np
+import os
+import sys
+import subprocess
+import wave
+import time
+from datetime import datetime
+
+CHUNK = 1024
+RATE = 48000 # サンプリング周波数
+
+# 録音時間を指定（秒単位）
+RECORD_TIME = 15
+
+# 音声閾値の検出回数
+audio_count = 0 #初期値
+AUDIO_START_COUNT = 40
+
+# 録音した音声を保存するファイル名を指定
+OUTPUT_DIRECTORY = "./output/"
+if not os.path.exists(OUTPUT_DIRECTORY):
+    os.makedirs(OUTPUT_DIRECTORY)
+
+# 録音用のコマンドを定義
+RECORD_COMMAND = "arecord -D plughw:1,0 -f cd -c 1 -r 44100 -d {} -t wav".format(RECORD_TIME)
+
+P = pyaudio.PyAudio()
+
+def record_audio():
+    global stream, audio_count
+    input = stream.read(CHUNK, exception_on_overflow=False)
+    # bufferからndarrayに変換
+    ndarray = np.frombuffer(input, dtype='int16')
+    a = [np.asscalar(i) for i in ndarray]
+    # print(a[0])
+    # 音声のレベルをチェックする
+    level = max(abs(x) for x in a)
+    if level > 1000:  # レベルの閾値
+        audio_count += 1
+        if audio_count == AUDIO_START_COUNT:
+            print('Start recording')
+            # 録音処理
+            stream.stop_stream()
+            stream.close()
+            current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            output_file = os.path.join(OUTPUT_DIRECTORY, "{}.wav".format(current_time))
+            subprocess.call("{} {}".format(RECORD_COMMAND, output_file), shell=True)
+            stream = P.open(format=pyaudio.paInt16, channels=2, rate=RATE, frames_per_buffer=CHUNK, input=True, output=False)
+            print('Stop Streaming')
+            audio_count = 0
+    return
+
+stream = P.open(format=pyaudio.paInt16, channels=2, rate=RATE, frames_per_buffer=CHUNK, input=True, output=False)
+while True:
+    try:
+        record_audio()
+    except KeyboardInterrupt:
+        break
+
+P.terminate()
+```
+
+USBオーディオアダプターの警告メッセージ根本対策は色々記事はあるが、面倒くさいので試してない。標準エラーを捨てる暫定対処
+
+ラズパイと切断後も動作させたければ、`nohup`や`disown`で対応すれば良い
+
+```{bash eval=F,echo=T}
+incoming_record.py 2> /dev/null 
+```

@@ -1,0 +1,13 @@
+h1:rasbian-os-32bit-setup Rasbian OS (32bit) setup
+h2:noobs NOOBS
+h2:基本設定 基本設定
+h2:ファームウェアの確認 ファームウェアの確認
+h2:システムの更新 システムの更新
+h2:vncの設定 VNCの設定
+h2:usb-audio-adapterの動作確認 USB Audio Adapterの動作確認
+h3:device情報を確認する Device情報を確認する
+h3:カード番号とデバイス番号の確認 カード番号とデバイス番号の確認
+h3:録音 録音
+h2:python Python
+h2:sdカードのバックアップ作成 SDカードのバックアップ作成
+

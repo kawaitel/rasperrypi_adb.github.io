@@ -1,0 +1,51 @@
+# ADBを使って発信する
+
+-   画面ロックはDisableであることが前提
+
+-   ADBを使うため、開発者向けオプションがONになっていること
+
+-   さらに機種によってはUSB Debugging （Security setting）をONにしておくこと
+
+-   スクリプトは座標を使っているので、端末が縦表示であることが前提です
+
+<!-- -->
+
+-   以下のスクリプトはRedmi Note 11用であり、**別機種に変更する場合** `touchscreen`**の座標（発信ボタンの座標）を変更する必要があります**
+
+-   長い時間端末を操作していないと、OSで規定されるdeepsleepの状態となりADBコマンドが動作しません。IDLE \_TIMEを変更する場合には考慮が必要です
+
+**call_by_adb.sh**
+
+```{bash eval=F,echo=T}
+#!/bin/bash
+# for Xiaomi Redmi Note 11
+HOLD_TIME=10
+IDLE_TIME=30
+argv=("$@")
+
+if [  ${#argv[@]} == 0  ]
+then
+    echo " usage: $0 dial_number"
+    exit
+fi
+
+while true
+do
+  adb shell input keyevent KEYCODE_WAKEUP
+  sleep 0.30
+  adb shell input swipe 0 2100  0 1500
+  sleep 0.30
+  adb shell input keyevent KEYCODE_HOME
+  sleep 1.30
+  adb shell input keyevent KEYCODE_HOME
+  sleep 1.30
+  adb shell am start -a android.intent.action.DIAL -d tel:$1  2>1 > /dev/null
+  sleep 2.00
+  adb shell input touchscreen tap 544 2090
+  sleep $HOLD_TIME
+  adb shell input touchscreen tap 544 2090
+  sleep 0.50
+  adb shell input keyevent KEYCODE_HOME
+  sleep $IDLE_TIME
+done
+```
