@@ -1,10 +1,11 @@
 Welcome! 
 
-This is a minimal example of a book based on R Markdown and **bookdown** (https://github.com/rstudio/bookdown). 
+Controlling Android Devices for Call Recording with Raspberry Pi
 
-This template provides a skeleton file structure that you can edit to create your book. 
+https://kawaitel.github.io/rasperrypi_adb.github.io/
 
-The contents inside the .Rmd files provide some pointers to help you get started, but feel free to also delete the content in each file and start fresh.
+generate this book `bookdown::render_book()`
+
 
 Additional resources:
 
