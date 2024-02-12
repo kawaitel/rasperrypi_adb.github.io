@@ -10,7 +10,8 @@ The guide includes steps for Raspberry Pi setup, verifying USB audio adapter fun
 
 For detailed instructions and scripts, visit the webpage
 
-https://kawaitel.github.io/rasperrypi_adb.github.io/
+https://kawaitel.github.io/rasperrypi_adb.github.io/  
+https://rpubs.com/kawaitel/1127402
 
 generate this book `bookdown::render_book()`
 
